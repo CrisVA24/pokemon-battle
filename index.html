@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Pokémon Battle</title>
+
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <main>
+        <h1>Pokémon Battle</h1>
+
+        <!-- Pantalla de selección -->
+        <section id="picker-screen">
+            <h2>Selecciona los luchadores</h2>
+
+            <div id="pokemon-pickers">
+                <!-- Pokémon 1 -->
+                <article class="pokemon-picker">
+                    <h3>Pokémon 1</h3>
+
+                    <label for="pokemon-1-search">Buscar Pokémon</label>
+                    <input type="text" id="pokemon-1-search" autocomplete="off">
+
+                    <p id="pokemon-1-status"></p>
+
+                    <div id="pokemon-1-suggestions"></div>
+
+                    <div id="pokemon-1-preview"></div>
+                </article>
+
+                <!-- Pokémon 2 -->
+                <article class="pokemon-picker">
+                    <h3>Pokémon 2</h3>
+
+                    <label for="pokemon-2-search">Buscar Pokémon</label>
+                    <input type="text" id="pokemon-2-search" autocomplete="off">
+
+                    <p id="pokemon-2-status"></p>
+
+                    <div id="pokemon-2-suggestions"></div>
+
+                    <div id="pokemon-2-preview"></div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Pantalla de batalla -->
+        <section id="battle-screen" class="hidden">
+            <h2>Batalla</h2>
+
+            <div id="battle-arena">
+                <article id="fighter-1"></article>
+
+                <p>VS</p>
+
+                <article id="fighter-2"></article>
+            </div>
+
+            <p id="battle-message"></p>
+
+            <button id="reset-button" type="button">Jugar de nuevo</button>
+        </section>
+    </main>
+</body>
+</html>
