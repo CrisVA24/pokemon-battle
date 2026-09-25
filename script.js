@@ -9,6 +9,10 @@ const pokemon1SearchInput = document.getElementById("pokemon-1-search");
 const pokemon1Suggestions = document.getElementById("pokemon-1-suggestions");
 const pokemon1Status = document.getElementById("pokemon-1-status");
 
+const pokemon2SearchInput = document.getElementById("pokemon-2-search");
+const pokemon2Suggestions = document.getElementById("pokemon-2-suggestions");
+const pokemon2Status = document.getElementById("pokemon-2-status");
+
 function debounce(callback, delay) {
     let timeoutId;
 
@@ -57,14 +61,18 @@ async function loadPokemonList() {
     }
 }
 
-function searchPokemon1() {
+function searchPokemon(
+    searchInput,
+    suggestionsContainer,
+    statusElement
+) {
     const searchTerm =
-        pokemon1SearchInput.value.trim().toLowerCase();
+        searchInput.value.trim().toLowerCase();
 
-    pokemon1Suggestions.replaceChildren();
+    suggestionsContainer.replaceChildren();
 
     if (searchTerm === "") {
-        pokemon1Status.textContent = "";
+        statusElement.textContent = "";
         return;
     }
 
@@ -75,12 +83,12 @@ function searchPokemon1() {
         .slice(0, 10);
 
     if (matches.length === 0) {
-        pokemon1Status.textContent =
+        statusElement.textContent =
             "No se encontraron Pokémon.";
         return;
     }
 
-    pokemon1Status.textContent = "";
+    statusElement.textContent = "";
 
     matches.forEach(function (pokemon) {
         const suggestionButton =
@@ -89,14 +97,31 @@ function searchPokemon1() {
         suggestionButton.type = "button";
         suggestionButton.textContent = pokemon.name;
 
-        pokemon1Suggestions.appendChild(
+        suggestionsContainer.appendChild(
             suggestionButton
         );
     });
 }
 
-const debouncedSearchPokemon1 = debounce(searchPokemon1, 400);
+const debouncedSearchPokemon1 =
+    debounce(function () {
+        searchPokemon(
+            pokemon1SearchInput,
+            pokemon1Suggestions,
+            pokemon1Status
+        );
+    }, 400);
+
+const debouncedSearchPokemon2 =
+    debounce(function () {
+        searchPokemon(
+            pokemon2SearchInput,
+            pokemon2Suggestions,
+            pokemon2Status
+        );
+    }, 400);
 
 pokemon1SearchInput.addEventListener("input", debouncedSearchPokemon1);
+pokemon2SearchInput.addEventListener("input", debouncedSearchPokemon2);
 
 loadPokemonList();
