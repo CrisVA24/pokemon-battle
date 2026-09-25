@@ -40,9 +40,7 @@ async function fetchPokemonList() {
 }
 
 async function fetchPokemonDetails(nameOrId) {
-    const response = await fetch(
-        `${API_BASE_URL}/pokemon/${nameOrId}`
-    );
+    const response = await fetch(`${API_BASE_URL}/pokemon/${nameOrId}`);
 
     if (!response.ok) {
         throw new Error("No se encontró el Pokémon.");
@@ -51,6 +49,69 @@ async function fetchPokemonDetails(nameOrId) {
     const data = await response.json();
 
     return data;
+}
+
+function formatPokemonData(data) {
+    const hpStat = data.stats.find(function (statItem) {
+        return statItem.stat.name === "hp";
+    });
+
+    const moves = data.moves
+        .slice(0, 4)
+        .map(function (moveItem) {
+            return moveItem.move.name;
+        });
+
+    return {
+        name: data.name,
+        sprite: data.sprites.front_default,
+        maxHp: hpStat.base_stat,
+        currentHp: hpStat.base_stat,
+        moves: moves
+    };
+}
+
+async function selectPokemon(name, fighterNumber) {
+    let searchInput;
+    let suggestionsContainer;
+    let statusElement;
+
+    if (fighterNumber === 1) {
+        searchInput = pokemon1SearchInput;
+        suggestionsContainer = pokemon1Suggestions;
+        statusElement = pokemon1Status;
+    } else {
+        searchInput = pokemon2SearchInput;
+        suggestionsContainer = pokemon2Suggestions;
+        statusElement = pokemon2Status;
+    }
+
+    suggestionsContainer.replaceChildren();
+
+    searchInput.disabled = true;
+    statusElement.textContent = "Cargando detalles...";
+
+    try {
+        const data = await fetchPokemonDetails(name);
+        const pokemon = formatPokemonData(data);
+
+        if (fighterNumber === 1) {
+            fighter1 = pokemon;
+        } else {
+            fighter2 = pokemon;
+        }
+
+        searchInput.value = pokemon.name;
+        statusElement.textContent = `${pokemon.name} seleccionado.`;
+
+        searchInput.disabled = false;
+    } catch (error) {
+        statusElement.textContent = "No se pudo cargar el Pokémon.";
+
+        searchInput.disabled = false;
+
+        console.error(error.message);
+    }
 }
 
 async function loadPokemonList() {
@@ -69,11 +130,9 @@ async function loadPokemonList() {
         pokemon1Status.textContent = "";
         pokemon2Status.textContent = "";
     } catch (error) {
-        pokemon1Status.textContent =
-            "No se pudo cargar la lista de Pokémon.";
+        pokemon1Status.textContent = "No se pudo cargar la lista de Pokémon.";
 
-        pokemon2Status.textContent =
-            "No se pudo cargar la lista de Pokémon.";
+        pokemon2Status.textContent = "No se pudo cargar la lista de Pokémon.";
 
         console.error(error.message);
     }
@@ -82,10 +141,10 @@ async function loadPokemonList() {
 function searchPokemon(
     searchInput,
     suggestionsContainer,
-    statusElement
+    statusElement,
+    fighterNumber
 ) {
-    const searchTerm =
-        searchInput.value.trim().toLowerCase();
+    const searchTerm = searchInput.value.trim().toLowerCase();
 
     suggestionsContainer.replaceChildren();
 
@@ -101,23 +160,29 @@ function searchPokemon(
         .slice(0, 10);
 
     if (matches.length === 0) {
-        statusElement.textContent =
-            "No se encontraron Pokémon.";
+        statusElement.textContent = "No se encontraron Pokémon.";
         return;
     }
 
     statusElement.textContent = "";
 
     matches.forEach(function (pokemon) {
-        const suggestionButton =
-            document.createElement("button");
+        const suggestionButton = document.createElement("button");
 
         suggestionButton.type = "button";
         suggestionButton.textContent = pokemon.name;
 
-        suggestionsContainer.appendChild(
-            suggestionButton
+        suggestionButton.addEventListener(
+            "click",
+            function () {
+                selectPokemon(
+                    pokemon.name,
+                    fighterNumber
+                );
+            }
         );
+
+        suggestionsContainer.appendChild(suggestionButton);
     });
 }
 
@@ -126,7 +191,8 @@ const debouncedSearchPokemon1 =
         searchPokemon(
             pokemon1SearchInput,
             pokemon1Suggestions,
-            pokemon1Status
+            pokemon1Status,
+            1
         );
     }, 400);
 
@@ -135,7 +201,8 @@ const debouncedSearchPokemon2 =
         searchPokemon(
             pokemon2SearchInput,
             pokemon2Suggestions,
-            pokemon2Status
+            pokemon2Status,
+            2
         );
     }, 400);
 
