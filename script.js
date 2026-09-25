@@ -54,9 +54,27 @@ async function fetchPokemonDetails(nameOrId) {
 }
 
 async function loadPokemonList() {
+    pokemon1SearchInput.disabled = true;
+    pokemon2SearchInput.disabled = true;
+
+    pokemon1Status.textContent = "Cargando Pokémon...";
+    pokemon2Status.textContent = "Cargando Pokémon...";
+
     try {
         pokemonList = await fetchPokemonList();
+
+        pokemon1SearchInput.disabled = false;
+        pokemon2SearchInput.disabled = false;
+
+        pokemon1Status.textContent = "";
+        pokemon2Status.textContent = "";
     } catch (error) {
+        pokemon1Status.textContent =
+            "No se pudo cargar la lista de Pokémon.";
+
+        pokemon2Status.textContent =
+            "No se pudo cargar la lista de Pokémon.";
+
         console.error(error.message);
     }
 }
