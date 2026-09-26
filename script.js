@@ -8,10 +8,12 @@ let battleOver = false;
 const pokemon1SearchInput = document.getElementById("pokemon-1-search");
 const pokemon1Suggestions = document.getElementById("pokemon-1-suggestions");
 const pokemon1Status = document.getElementById("pokemon-1-status");
+const pokemon1Preview = document.getElementById("pokemon-1-preview");
 
 const pokemon2SearchInput = document.getElementById("pokemon-2-search");
 const pokemon2Suggestions = document.getElementById("pokemon-2-suggestions");
 const pokemon2Status = document.getElementById("pokemon-2-status");
+const pokemon2Preview = document.getElementById("pokemon-2-preview");
 
 function debounce(callback, delay) {
     let timeoutId;
@@ -71,19 +73,53 @@ function formatPokemonData(data) {
     };
 }
 
+function renderPokemonPreview(pokemon, previewContainer) {
+    const name = document.createElement("h4");
+    name.textContent = pokemon.name;
+
+    const sprite = document.createElement("img");
+    sprite.src = pokemon.sprite;
+    sprite.alt = pokemon.name;
+
+    const hp = document.createElement("p");
+    hp.textContent = `HP: ${pokemon.currentHp}`;
+
+    const movesContainer = document.createElement("div");
+
+    pokemon.moves.forEach(function (move) {
+        const moveButton = document.createElement("button");
+
+        moveButton.type = "button";
+        moveButton.textContent = move;
+        moveButton.disabled = true;
+
+        movesContainer.appendChild(moveButton);
+    });
+
+    previewContainer.replaceChildren(
+        name,
+        sprite,
+        hp,
+        movesContainer
+    );
+}
+
 async function selectPokemon(name, fighterNumber) {
     let searchInput;
     let suggestionsContainer;
     let statusElement;
+    let previewContainer;
 
     if (fighterNumber === 1) {
         searchInput = pokemon1SearchInput;
         suggestionsContainer = pokemon1Suggestions;
         statusElement = pokemon1Status;
+        previewContainer = pokemon1Preview;
     } else {
         searchInput = pokemon2SearchInput;
         suggestionsContainer = pokemon2Suggestions;
         statusElement = pokemon2Status;
+        previewContainer = pokemon2Preview;
     }
 
     suggestionsContainer.replaceChildren();
@@ -100,6 +136,8 @@ async function selectPokemon(name, fighterNumber) {
         } else {
             fighter2 = pokemon;
         }
+
+        renderPokemonPreview(pokemon, previewContainer);
 
         searchInput.value = pokemon.name;
         statusElement.textContent = `${pokemon.name} seleccionado.`;
@@ -186,24 +224,12 @@ function searchPokemon(
     });
 }
 
-const debouncedSearchPokemon1 =
-    debounce(function () {
-        searchPokemon(
-            pokemon1SearchInput,
-            pokemon1Suggestions,
-            pokemon1Status,
-            1
-        );
+const debouncedSearchPokemon1 = debounce(function () {
+        searchPokemon(pokemon1SearchInput, pokemon1Suggestions, pokemon1Status, 1);
     }, 400);
 
-const debouncedSearchPokemon2 =
-    debounce(function () {
-        searchPokemon(
-            pokemon2SearchInput,
-            pokemon2Suggestions,
-            pokemon2Status,
-            2
-        );
+const debouncedSearchPokemon2 = debounce(function () {
+        searchPokemon(pokemon2SearchInput, pokemon2Suggestions, pokemon2Status, 2);
     }, 400);
 
 pokemon1SearchInput.addEventListener("input", debouncedSearchPokemon1);
