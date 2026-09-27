@@ -15,6 +15,12 @@ const pokemon2Suggestions = document.getElementById("pokemon-2-suggestions");
 const pokemon2Status = document.getElementById("pokemon-2-status");
 const pokemon2Preview = document.getElementById("pokemon-2-preview");
 
+const pickerScreen = document.getElementById("picker-screen");
+const battleScreen = document.getElementById("battle-screen");
+const fighter1Container = document.getElementById("fighter-1");
+const fighter2Container = document.getElementById("fighter-2");
+const battleMessage = document.getElementById("battle-message");
+
 function debounce(callback, delay) {
     let timeoutId;
 
@@ -104,6 +110,64 @@ function renderPokemonPreview(pokemon, previewContainer) {
     );
 }
 
+function renderFighter(pokemon, fighterContainer) {
+    const name = document.createElement("h3");
+    name.textContent = pokemon.name;
+
+    const sprite = document.createElement("img");
+    sprite.src = pokemon.sprite;
+    sprite.alt = pokemon.name;
+
+    const hp = document.createElement("p");
+    hp.textContent = `HP: ${pokemon.currentHp} / ${pokemon.maxHp}`;
+
+    const hpBar = document.createElement("progress");
+    hpBar.max = pokemon.maxHp;
+    hpBar.value = pokemon.currentHp;
+
+    const movesContainer = document.createElement("div");
+
+    pokemon.moves.forEach(function (move) {
+        const moveButton = document.createElement("button");
+
+        moveButton.type = "button";
+        moveButton.textContent = move;
+        moveButton.disabled = true;
+
+        movesContainer.appendChild(moveButton);
+    });
+
+    fighterContainer.replaceChildren(
+        name,
+        sprite,
+        hp,
+        hpBar,
+        movesContainer
+    );
+}
+
+function startBattle() {
+    fighter1.currentHp = fighter1.maxHp;
+    fighter2.currentHp = fighter2.maxHp;
+
+    battleOver = false;
+
+    renderFighter(fighter1, fighter1Container);
+
+    renderFighter(fighter2, fighter2Container);
+
+    battleMessage.textContent = "¡Comienza la batalla!";
+
+    pickerScreen.classList.add("hidden");
+    battleScreen.classList.remove("hidden");
+}
+
+function checkFightersReady() {
+    if (fighter1 !== null && fighter2 !== null) {
+        startBattle();
+    }
+}
+
 async function selectPokemon(name, fighterNumber) {
     let searchInput;
     let suggestionsContainer;
@@ -143,6 +207,8 @@ async function selectPokemon(name, fighterNumber) {
         statusElement.textContent = `${pokemon.name} seleccionado.`;
 
         searchInput.disabled = false;
+
+        checkFightersReady();
     } catch (error) {
         statusElement.textContent = "No se pudo cargar el Pokémon.";
 
