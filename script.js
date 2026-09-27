@@ -21,6 +21,8 @@ const fighter1Container = document.getElementById("fighter-1");
 const fighter2Container = document.getElementById("fighter-2");
 const battleMessage = document.getElementById("battle-message");
 
+const resetButton = document.getElementById("reset-button");
+
 function debounce(callback, delay) {
     let timeoutId;
 
@@ -123,7 +125,15 @@ function attackPokemon(attacker, defender, move) {
 
     defender.currentHp = Math.max(0, defender.currentHp - damage);
 
-    battleMessage.textContent = `${attacker.name} usó ${move} e hizo ${damage} de daño.`;
+    if (defender.currentHp === 0) {
+        battleOver = true;
+
+        battleMessage.textContent = `${attacker.name} ganó la batalla.`;
+
+        resetButton.classList.remove("hidden");
+    } else {
+        battleMessage.textContent = `${attacker.name} usó ${move} e hizo ${damage} de daño.`;
+    }
 
     renderBattle();
 }
@@ -150,6 +160,7 @@ function renderFighter(pokemon, opponent, fighterContainer) {
 
         moveButton.type = "button";
         moveButton.textContent = move;
+        moveButton.disabled = battleOver;
 
         moveButton.addEventListener("click", function () {
             attackPokemon(pokemon, opponent, move);
@@ -179,12 +190,45 @@ function startBattle() {
 
     battleOver = false;
 
+    resetButton.classList.add("hidden");
+
     renderBattle();
 
     battleMessage.textContent = "¡Comienza la batalla!";
 
     pickerScreen.classList.add("hidden");
     battleScreen.classList.remove("hidden");
+}
+
+function resetBattle() {
+    fighter1 = null;
+    fighter2 = null;
+    battleOver = false;
+
+    pokemon1SearchInput.value = "";
+    pokemon2SearchInput.value = "";
+
+    pokemon1SearchInput.disabled = false;
+    pokemon2SearchInput.disabled = false;
+
+    pokemon1Status.textContent = "";
+    pokemon2Status.textContent = "";
+
+    pokemon1Suggestions.replaceChildren();
+    pokemon2Suggestions.replaceChildren();
+
+    pokemon1Preview.replaceChildren();
+    pokemon2Preview.replaceChildren();
+
+    fighter1Container.replaceChildren();
+    fighter2Container.replaceChildren();
+
+    battleMessage.textContent = "";
+
+    resetButton.classList.add("hidden");
+
+    battleScreen.classList.add("hidden");
+    pickerScreen.classList.remove("hidden");
 }
 
 function checkFightersReady() {
@@ -325,5 +369,7 @@ const debouncedSearchPokemon2 = debounce(function () {
 
 pokemon1SearchInput.addEventListener("input", debouncedSearchPokemon1);
 pokemon2SearchInput.addEventListener("input", debouncedSearchPokemon2);
+
+resetButton.addEventListener("click", resetBattle);
 
 loadPokemonList();
