@@ -43,4 +43,4 @@ No requiere API key ni backend.
 
 ## Sitio publicado
 
-https://crisva24.github.io/pokemon/
+https://crisva24.github.io/pokemon-battle/
