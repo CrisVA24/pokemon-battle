@@ -110,7 +110,25 @@ function renderPokemonPreview(pokemon, previewContainer) {
     );
 }
 
-function renderFighter(pokemon, fighterContainer) {
+function getRandomDamage() {
+    return Math.floor(Math.random() * 11) + 5;
+}
+
+function attackPokemon(attacker, defender, move) {
+    if (battleOver) {
+        return;
+    }
+
+    const damage = getRandomDamage();
+
+    defender.currentHp = Math.max(0, defender.currentHp - damage);
+
+    battleMessage.textContent = `${attacker.name} usó ${move} e hizo ${damage} de daño.`;
+
+    renderBattle();
+}
+
+function renderFighter(pokemon, opponent, fighterContainer) {
     const name = document.createElement("h3");
     name.textContent = pokemon.name;
 
@@ -132,7 +150,10 @@ function renderFighter(pokemon, fighterContainer) {
 
         moveButton.type = "button";
         moveButton.textContent = move;
-        moveButton.disabled = true;
+
+        moveButton.addEventListener("click", function () {
+            attackPokemon(pokemon, opponent, move);
+        });
 
         movesContainer.appendChild(moveButton);
     });
@@ -146,15 +167,19 @@ function renderFighter(pokemon, fighterContainer) {
     );
 }
 
+function renderBattle() {
+    renderFighter(fighter1, fighter2, fighter1Container);
+
+    renderFighter(fighter2, fighter1, fighter2Container);
+}
+
 function startBattle() {
     fighter1.currentHp = fighter1.maxHp;
     fighter2.currentHp = fighter2.maxHp;
 
     battleOver = false;
 
-    renderFighter(fighter1, fighter1Container);
-
-    renderFighter(fighter2, fighter2Container);
+    renderBattle();
 
     battleMessage.textContent = "¡Comienza la batalla!";
 
